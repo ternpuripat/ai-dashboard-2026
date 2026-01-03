@@ -74,6 +74,7 @@
         <option value="3">ไม่รีบ (P3)</option>
     </select>
     <button onclick="addTask()">เพิ่มงาน</button>
+    <button onclick="clearTasks()" style="background-color: #dc3545;">ล้างงานทั้งหมด</button>
 
     <button onclick="askAIForAdvice()" style="background-color: #28a745;">ขอคำแนะนำจาก AI</button>
 
@@ -188,5 +189,10 @@ async function askAIForAdvice() {
     setTimeout(() => {
         resultArea.innerHTML = `<b>คำแนะนำจาก AI:</b><br>คุณมีงานด่วน (P1) คือ "${tasks[0].name}" ควรทำเป็นอย่างแรก! <br>ส่วนงานอื่นๆ สามารถรอได้ ลองแบ่งเวลาทำช่วงบ่ายนะครับ`;
     }, 1500);
+}
+
+function clearTasks(){
+    tasks = [];
+    renderTasks();
 }
 </script>
