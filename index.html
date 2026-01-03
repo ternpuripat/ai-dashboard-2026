@@ -64,6 +64,23 @@
         </div>
     </section>
 
+    <hr>
+<section>
+    <h3>📝 รายการงานที่ต้องทำ (Task List)</h3>
+    <input type="text" id="taskName" placeholder="ชื่องาน...">
+    <select id="taskPriority">
+        <option value="1">ด่วนมาก (P1)</option>
+        <option value="2">ปกติ (P2)</option>
+        <option value="3">ไม่รีบ (P3)</option>
+    </select>
+    <button onclick="addTask()">เพิ่มงาน</button>
+
+    <button onclick="askAIForAdvice()" style="background-color: #28a745;">ขอคำแนะนำจาก AI</button>
+
+    <ul id="taskList" style="text-align: left; list-style: none; padding: 0;">
+        </ul>
+</section>
+
 </body>
 </html>
 
@@ -116,4 +133,60 @@
             console.error(error);
         }
     }
+// สร้างตัวแปรมาเก็บรายการงาน (เป็น Array หรือกล่องเก็บของหลายๆ ช่อง)
+let tasks = [];
+
+function addTask() {
+    const name = document.getElementById('taskName').value;
+    const priority = document.getElementById('taskPriority').value;
+
+    if (!name) return alert("กรุณาใส่ชื่อกิจกรรม");
+
+    // สร้าง Object งานชิ้นใหม่
+    const newTask = {
+        name: name,
+        priority: parseInt(priority) // แปลงตัวอักษรเป็นตัวเลขเพื่อเปรียบเทียบ
+    };
+
+    // เพิ่มงานเข้าไปในรายการ
+    tasks.push(newTask);
+
+    // --- กุญแจสำคัญ: การจัดลำดับ (Sort) ---
+    // บอกคอมพิวเตอร์ว่า: "เรียงงานที่มี priority น้อยไปหามาก"
+    tasks.sort((a, b) => a.priority - b.priority);
+
+    // สั่งให้หน้าเว็บแสดงผลใหม่
+    renderTasks();
+    
+    // ล้างช่องพิมพ์
+    document.getElementById('taskName').value = "";
+}
+
+function renderTasks() {
+    const listArea = document.getElementById('taskList');
+    listArea.innerHTML = ""; // ล้างหน้าเว็บก่อนวาดใหม่
+
+    tasks.forEach((item) => {
+        let color = item.priority === 1 ? 'red' : (item.priority === 2 ? 'orange' : 'green');
+        listArea.innerHTML += `<li style="margin-bottom: 5px; color: ${color};">
+            [P${item.priority}] ${item.name}
+        </li>`;
+    });
+}  
+
+async function askAIForAdvice() {
+    if (tasks.length === 0) return alert("เพิ่มงานก่อนสิครับ!");
+
+    const resultArea = document.getElementById('resultBox');
+    resultArea.innerHTML = "AI กำลังวิเคราะห์ตารางงานของคุณ... 🧠";
+
+    // รวมรายการงานทั้งหมดเป็นข้อความเดียวเพื่อส่งให้ AI
+    let taskString = tasks.map(t => `[P${t.priority}] ${t.name}`).join(", ");
+
+    // ส่งไปถาม AI (เราจะใช้ Mockup หรือ API Key เดิมถ้าคุณจัดการเรื่อง Billing แล้ว)
+    // แต่เพื่อความชัวร์ ผมจะให้มันทำ Logic การสรุปเบื้องต้นก่อน
+    setTimeout(() => {
+        resultArea.innerHTML = `<b>คำแนะนำจาก AI:</b><br>คุณมีงานด่วน (P1) คือ "${tasks[0].name}" ควรทำเป็นอย่างแรก! <br>ส่วนงานอื่นๆ สามารถรอได้ ลองแบ่งเวลาทำช่วงบ่ายนะครับ`;
+    }, 1500);
+}
 </script>
