@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Workspace - ternpuripat</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f2f5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 50px;
+    }
+    header, section {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 600px;
+        margin-bottom: 20px;
+    }
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    #resultBox {
+        background-color: #e9ecef;
+        border-radius: 5px;
+    }
+</style>
+</head>
+<body>
+
+    <header>
+        <h1>My Smart Dashboard 2026</h1>
+        <p>ผู้พัฒนา: ternpuripat (GitHub: @ternpuripat)</p>
+    </header>
+
+    <hr>
+
+    <section>
+        <h3>ป้อนคำสั่งให้ AI ของคุณ</h3>
+        <textarea id="userInput" placeholder="พิมพ์ข้อความที่นี่..." rows="4" cols="50"></textarea>
+        <br>
+        <button onclick="processAI()">ส่งคำสั่งให้ AI</button>
+    </section>
+
+    <hr>
+
+    <section>
+        <h3>ผลลัพธ์จากระบบ:</h3>
+        <div id="resultBox" style="border: 1px solid #ccc; padding: 10px; min-height: 50px;">
+            (รอการประมวลผล...)
+        </div>
+    </section>
+
+</body>
+</html>
+
+<script>
+    async function processAI() {
+        const input = document.getElementById('userInput').value;
+        const resultArea = document.getElementById('resultBox');
+        
+        // ก๊อปปี้ Key ใหม่มาวางที่นี่
+        const myKey = "AIzaSyCMnmzhSnpwnkWI3rBsnH-R37DQ5MC3v8g"; 
+        
+        if (!input) return alert("กรุณาพิมพ์ข้อความก่อนครับ!");
+
+        resultArea.innerHTML = "กำลังติดต่อสมองกล AI... ✨";
+
+        try {
+            // ใช้ URL แบบเชื่อมสายอักขระธรรมดาเพื่อป้องกันความผิดพลาดของตัวอักษรพิเศษ
+            // เปลี่ยน v1beta เป็น v1 
+            const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + myKey;
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ 
+                        parts: [{ 
+                            text: "จงเปลี่ยนประโยคนี้ให้เป็นภาษาอังกฤษที่สุภาพและเป็นทางการสำหรับที่ทำงาน: " + input 
+                        }] 
+                    }]
+                })
+            });
+
+            const data = await response.json();
+
+            // ตรวจสอบว่ามี Error จาก Google ไหม
+            if (data.error) {
+                resultArea.innerHTML = "Google แจ้งข้อผิดพลาด: " + data.error.message;
+                return;
+            }
+            
+            if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+                const aiText = data.candidates[0].content.parts[0].text;
+                resultArea.innerHTML = "<b>ฉบับมืออาชีพ:</b><br><span style='color: #007bff;'>" + aiText + "</span>";
+            } else {
+                resultArea.innerHTML = "ได้รับข้อมูลไม่ครบถ้วน ลองใหม่อีกครั้งนะครับ";
+            }
+            
+        } catch (error) {
+            resultArea.innerHTML = "เกิดข้อผิดพลาด: โปรดตรวจสอบอินเทอร์เน็ตหรือ API Key";
+            console.error(error);
+        }
+    }
+</script>
