@@ -85,12 +85,14 @@
 </body>
 </html>
 
+
 <script>
+
     async function processAI() {
         const input = document.getElementById('userInput').value;
         const resultArea = document.getElementById('resultBox');
         
-        // ก๊อปปี้ Key ใหม่มาวางที่นี่
+        // ใส่ API Key ของคุณตรงนี้
         const myKey = "DEMO_MODE_ACTIVE"; 
         
         if (!input) return alert("กรุณาพิมพ์ข้อความก่อนครับ!");
@@ -98,8 +100,6 @@
         resultArea.innerHTML = "กำลังติดต่อสมองกล AI... ✨";
 
         try {
-            // ใช้ URL แบบเชื่อมสายอักขระธรรมดาเพื่อป้องกันความผิดพลาดของตัวอักษรพิเศษ
-            // เปลี่ยน v1beta เป็น v1 
             const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + myKey;
 
             const response = await fetch(url, {
@@ -137,6 +137,13 @@
 // สร้างตัวแปรมาเก็บรายการงาน (เป็น Array หรือกล่องเก็บของหลายๆ ช่อง)
 let tasks = [];
 
+// เมื่อเปิดเว็บขึ้นมา ให้ไปเช็กใน "ตู้เซฟ" ว่ามีงานเก่าบันทึกไว้ไหม
+const savedTasks = localStorage.getItem('myTasks');
+if (savedTasks) {
+    tasks = JSON.parse(savedTasks);
+    renderTasks(); // วาดงานเก่าออกมาโชว์ทันที
+}
+
 function addTask() {
     const name = document.getElementById('taskName').value;
     const priority = document.getElementById('taskPriority').value;
@@ -161,7 +168,12 @@ function addTask() {
     
     // ล้างช่องพิมพ์
     document.getElementById('taskName').value = "";
+
+    // จัดเก็บข้อมูลลงใน localStorage
+    localStorage.setItem('myTasks', JSON.stringify(tasks));
 }
+
+
 
 function renderTasks() {
     const listArea = document.getElementById('taskList');
@@ -184,8 +196,7 @@ async function askAIForAdvice() {
     // รวมรายการงานทั้งหมดเป็นข้อความเดียวเพื่อส่งให้ AI
     let taskString = tasks.map(t => `[P${t.priority}] ${t.name}`).join(", ");
 
-    // ส่งไปถาม AI (เราจะใช้ Mockup หรือ API Key เดิมถ้าคุณจัดการเรื่อง Billing แล้ว)
-    // แต่เพื่อความชัวร์ ผมจะให้มันทำ Logic การสรุปเบื้องต้นก่อน
+    // จำลองการตอบกลับจาก AI 
     setTimeout(() => {
         resultArea.innerHTML = `<b>คำแนะนำจาก AI:</b><br>คุณมีงานด่วน (P1) คือ "${tasks[0].name}" ควรทำเป็นอย่างแรก! <br>ส่วนงานอื่นๆ สามารถรอได้ ลองแบ่งเวลาทำช่วงบ่ายนะครับ`;
     }, 1500);
@@ -194,5 +205,9 @@ async function askAIForAdvice() {
 function clearTasks(){
     tasks = [];
     renderTasks();
+    // จัดเก็บข้อมูลลงใน localStorage
+    localStorage.setItem('myTasks', JSON.stringify(tasks));
+
 }
+
 </script>
